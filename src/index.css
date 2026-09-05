@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Shake animation for screen when clicking or exploding */
+@keyframes screen-shake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-8px, -6px) rotate(-1deg); }
+  20% { transform: translate(8px, 6px) rotate(1deg); }
+  30% { transform: translate(-6px, 8px) rotate(-1.5deg); }
+  40% { transform: translate(6px, -8px) rotate(1.5deg); }
+  50% { transform: translate(-10px, 4px) rotate(-2deg); }
+  60% { transform: translate(10px, -4px) rotate(2deg); }
+  70% { transform: translate(-6px, 6px) rotate(-1deg); }
+  80% { transform: translate(6px, -6px) rotate(1deg); }
+  90% { transform: translate(-2px, 2px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.animate-screen-shake {
+  animation: screen-shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Flash shockwave */
+@keyframes explosion-flash {
+  0% { opacity: 0; transform: scale(0.1); }
+  40% { opacity: 1; transform: scale(1.8); }
+  100% { opacity: 0; transform: scale(3.5); }
+}
+
+.animate-explosion-flash {
+  animation: explosion-flash 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+/* Flying particle blast */
+@keyframes particle-burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+.animate-particle {
+  animation: particle-burst 0.85s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+/* Meme button hover and wiggle */
+@keyframes meme-wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-2deg) scale(1.03); }
+  75% { transform: rotate(2deg) scale(1.03); }
+}
+
+.hover-meme-wiggle:hover {
+  animation: meme-wiggle 0.5s ease-in-out infinite;
+}
