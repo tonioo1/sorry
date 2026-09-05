@@ -75,12 +75,22 @@ export default function App() {
     }
   };
 
-  // Handle button 1 ("是的") click
+  // Handle button 1 ("是的") click - redirects user to target video link
+  const TARGET_VIDEO_URL = "https://www.bilibili.tv/en/video/4800495105612289?bstar_from=bstar-web.homepage.recommend.all";
+
   const handleYesClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isExploding || isGivenUp) return;
+    if (isExploding || isGivenUp) {
+      e.preventDefault();
+      return;
+    }
     sound.playPop();
     setIsAccepted(true);
+
+    // Give visual and sound feedback, then redirect to the video link
+    setTimeout(() => {
+      window.location.href = TARGET_VIDEO_URL;
+    }, 400);
   };
 
   // Trigger explosion animation
@@ -143,19 +153,30 @@ export default function App() {
     return (
       <main
         id="give-up-screen"
-        className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 select-none cursor-pointer transition-opacity duration-700 ease-in"
-        onClick={handleReset}
-        title="Click anywhere to retry"
+        className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 select-none transition-opacity duration-700 ease-in"
       >
         <h1
           id="give-up-message"
-          className="text-3xl sm:text-5xl md:text-6xl font-black text-black tracking-tight text-center font-sans"
+          className="text-3xl sm:text-5xl md:text-6xl font-black text-black tracking-tight text-center font-sans mb-8"
         >
           okay I give up
         </h1>
-        <p className="text-xs text-stone-400 mt-6 tracking-widest uppercase hover:text-stone-600 transition-colors">
-          (click anywhere to try again)
-        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <a
+            id="give-up-video-link"
+            href={TARGET_VIDEO_URL}
+            className="px-8 py-3 rounded-full bg-black text-white font-bold text-base tracking-wider hover:bg-neutral-800 transition-all shadow-md active:scale-95"
+          >
+            去看视频 🎬
+          </a>
+          <button
+            id="retry-button"
+            onClick={handleReset}
+            className="px-6 py-2.5 rounded-full border border-stone-300 text-stone-600 font-medium text-sm hover:border-black hover:text-black transition-all cursor-pointer active:scale-95"
+          >
+            再试一次 (Try again)
+          </button>
+        </div>
       </main>
     );
   }
@@ -264,17 +285,18 @@ export default function App() {
                 zIndex: 40 + noClicks,
               }}
             >
-              <button
+              <a
                 id="button-1-yes"
+                href={TARGET_VIDEO_URL}
                 onClick={handleYesClick}
-                className={`px-8 py-2.5 rounded-full font-black text-base tracking-wider shadow-md transition-all duration-200 cursor-pointer active:scale-95 whitespace-nowrap border-2 ${
+                className={`px-8 py-2.5 rounded-full font-black text-base tracking-wider shadow-md transition-all duration-200 cursor-pointer active:scale-95 whitespace-nowrap border-2 inline-flex items-center justify-center text-center ${
                   isAccepted
                     ? 'bg-emerald-600 text-white border-emerald-700 ring-4 ring-emerald-200'
                     : 'bg-black text-white border-black hover:bg-neutral-800'
                 }`}
               >
-                {isAccepted ? '已答应 🎉' : '是的'}
-              </button>
+                {isAccepted ? '已答应 🎉 跳转中...' : '是的'}
+              </a>
             </div>
 
             {/* Button 2: "不" (moves to the side dynamically as Button 1 grows, avoiding any overlap) */}
