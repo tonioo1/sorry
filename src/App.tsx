@@ -99,7 +99,7 @@ export default function App() {
   };
 
   // Handle button 1 ("是的") click - redirects user to target video link
-  const TARGET_VIDEO_URL = "https://www.bilibili.tv/en/video/4800495105612289?bstar_from=bstar-web.homepage.recommend.all";
+  const TARGET_VIDEO_URL = "https://www.bilibili.com/video/BV1zgMB6bEC8/?spm_id_from=333.337.search-card.all.click&vd_source=5eb1db14c3493fa6b9cf5614f7cb0d0f";
 
   const handleYesClick = (e: React.MouseEvent) => {
     e.stopPropagation();
