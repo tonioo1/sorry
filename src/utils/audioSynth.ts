@@ -113,6 +113,59 @@ class AudioSynthesizer {
     subOsc.start(now);
     subOsc.stop(now + 1.35);
   }
+
+  // Iconic flashbang sound: sharp tactical stun crack + realistic high-pitch ringing tinnitus tone decaying over 3s
+  playFlashbang() {
+    if (!this.enabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // 1. Initial sharp stun crack
+    const popOsc = ctx.createOscillator();
+    const popGain = ctx.createGain();
+    popOsc.type = 'triangle';
+    popOsc.frequency.setValueAtTime(450, now);
+    popOsc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+    popGain.gain.setValueAtTime(0.7, now);
+    popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    popOsc.connect(popGain);
+    popGain.connect(ctx.destination);
+    popOsc.start(now);
+    popOsc.stop(now + 0.18);
+
+    // 2. White noise burst for the concussive blast
+    const bufferSize = Math.floor(ctx.sampleRate * 0.3);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.06));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.5, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now);
+
+    // 3. Iconic high-frequency tinnitus ringing (~3800Hz)
+    const ringOsc = ctx.createOscillator();
+    const ringGain = ctx.createGain();
+    ringOsc.type = 'sine';
+    ringOsc.frequency.setValueAtTime(3800, now);
+    ringOsc.frequency.linearRampToValueAtTime(3600, now + 2.5);
+
+    ringGain.gain.setValueAtTime(0.35, now);
+    ringGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
+
+    ringOsc.connect(ringGain);
+    ringGain.connect(ctx.destination);
+    ringOsc.start(now + 0.01);
+    ringOsc.stop(now + 3.05);
+  }
 }
 
 export const sound = new AudioSynthesizer();

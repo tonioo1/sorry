@@ -28,6 +28,59 @@
   animation: screen-shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* Flashbang blinding whiteout animation */
+@keyframes flashbang-blinding {
+  0% {
+    opacity: 1;
+    filter: brightness(3.5) contrast(1.5);
+  }
+  10% {
+    opacity: 1;
+    filter: brightness(3);
+  }
+  35% {
+    opacity: 0.98;
+    filter: brightness(2.2);
+  }
+  60% {
+    opacity: 0.9;
+    filter: brightness(1.6);
+  }
+  80% {
+    opacity: 0.55;
+    filter: brightness(1.2);
+  }
+  100% {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+.animate-flashbang-blinding {
+  animation: flashbang-blinding 2.4s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+}
+
+/* Flashbang radial burn/ring burst */
+@keyframes flashbang-burst {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(2.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(4.5);
+    opacity: 0;
+  }
+}
+
+.animate-flashbang-burst {
+  animation: flashbang-burst 1.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
 /* Flash shockwave */
 @keyframes explosion-flash {
   0% { opacity: 0; transform: scale(0.1); }

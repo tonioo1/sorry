@@ -1,6 +1,6 @@
 {
   "name": "Chinese Apology Humor",
-  "description": "An interactive Chinese apology meme experience featuring the iconic '惹不起' panda, expanding yes button, and comic explosion.",
+  "description": "An interactive Chinese apology meme experience featuring the iconic '惹不起' panda, expanding yes button, tactical flashbang, and '中国人不会再飞了'.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

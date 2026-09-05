@@ -14,28 +14,18 @@ export default function App() {
   // 1. Initial: hasClickedMeme = false -> only meme image button is visible
   // 2. hasClickedMeme = true -> 2 buttons ("是的" and "不") appear below the image
   // 3. noClicks: 0 to 10 -> "是的" gets bigger every time "不" is clicked, "不" slides to the side, and more image.png appear at random places
-  // 4. isExploding: true -> explosion visual effects and screen shake
-  // 5. isGivenUp: true -> webpage is completely erased, leaves ONLY "okay I give up"
+  // 4. isFlashbanging: true -> tactical flashbang whiteout, blinding flash, and tinnitus ringing sound
+  // 5. isGivenUp: true -> webpage shows "中国人不会再飞了"
   const [hasClickedMeme, setHasClickedMeme] = useState(false);
   const [noClicks, setNoClicks] = useState(0);
-  const [isExploding, setIsExploding] = useState(false);
+  const [isFlashbanging, setIsFlashbanging] = useState(false);
   const [isGivenUp, setIsGivenUp] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [randomMemes, setRandomMemes] = useState<RandomMeme[]>([]);
 
-  // Particles for explosion
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    tx: string;
-    ty: string;
-    size: number;
-    color: string;
-    delay: number;
-  }>>([]);
-
   // Handle meme image click (toggles buttons expansion/retraction)
   const handleMemeClick = () => {
-    if (isExploding || isGivenUp) return;
+    if (isFlashbanging || isGivenUp) return;
     sound.playPop();
     setHasClickedMeme((prev) => !prev);
   };
@@ -43,7 +33,7 @@ export default function App() {
   // Handle button 2 ("不") click
   const handleNoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isExploding || isGivenUp) return;
+    if (isFlashbanging || isGivenUp) return;
 
     const nextClicks = noClicks + 1;
     setNoClicks(nextClicks);
@@ -68,8 +58,8 @@ export default function App() {
     setRandomMemes((prev) => [...prev, ...newMemeList]);
 
     if (nextClicks >= 10) {
-      // Trigger dramatic explosion!
-      triggerExplosion();
+      // Trigger tactical flashbang!
+      triggerFlashbang();
     } else {
       sound.playGrow(nextClicks);
     }
@@ -80,7 +70,7 @@ export default function App() {
 
   const handleYesClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isExploding || isGivenUp) {
+    if (isFlashbanging || isGivenUp) {
       e.preventDefault();
       return;
     }
@@ -93,46 +83,29 @@ export default function App() {
     }, 400);
   };
 
-  // Trigger explosion animation
-  const triggerExplosion = () => {
-    setIsExploding(true);
-    sound.playExplosion();
+  // Trigger flashbang animation
+  const triggerFlashbang = () => {
+    setIsFlashbanging(true);
+    sound.playFlashbang();
 
-    // Generate 50 blast particles flying in all directions
-    const newParticles = Array.from({ length: 50 }, (_, i) => {
-      const angle = (i / 50) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const distance = 150 + Math.random() * 450;
-      const tx = `${Math.cos(angle) * distance}px`;
-      const ty = `${Math.sin(angle) * distance}px`;
-      const size = 8 + Math.random() * 24;
-      const colors = ['#ff2200', '#ff8800', '#ffdd00', '#111111', '#555555', '#ff4444', '#ffffff'];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      return {
-        id: i,
-        tx,
-        ty,
-        size,
-        color,
-        delay: Math.random() * 0.1,
-      };
-    });
-    setParticles(newParticles);
-
-    // After explosion completes (1.1s), erase everything and leave only "okay I give up"
+    // After the initial blinding flash (900ms), transition the underlying state to "中国人不会再飞了"
     setTimeout(() => {
-      setIsExploding(false);
       setIsGivenUp(true);
-    }, 1100);
+    }, 900);
+
+    // Keep flashbang blinding overlay active while it smoothly fades out (2.4s)
+    setTimeout(() => {
+      setIsFlashbanging(false);
+    }, 2400);
   };
 
   // Reset helper
   const handleReset = () => {
     setHasClickedMeme(false);
     setNoClicks(0);
-    setIsExploding(false);
+    setIsFlashbanging(false);
     setIsGivenUp(false);
     setIsAccepted(false);
-    setParticles([]);
     setRandomMemes([]);
   };
 
@@ -148,24 +121,34 @@ export default function App() {
   const yesExpansionRight = (baseButtonWidth * (yesScale - 1)) / 2;
   const noButtonTranslateX = Math.round(yesExpansionRight + noClicks * 18);
 
-  // If in the erased "okay I give up" final state:
+  // If in the final state after 10 clicks on button 2:
   if (isGivenUp) {
     return (
       <main
-        id="give-up-screen"
-        className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 select-none transition-opacity duration-700 ease-in"
+        id="final-message-screen"
+        className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 select-none relative overflow-hidden"
       >
+        {/* Flashbang lingering fade-out overlay */}
+        {isFlashbanging && (
+          <div
+            className="fixed inset-0 z-50 pointer-events-none bg-white animate-flashbang-blinding flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <div className="w-96 h-96 rounded-full bg-white animate-flashbang-burst filter blur-md" />
+          </div>
+        )}
+
         <h1
-          id="give-up-message"
-          className="text-3xl sm:text-5xl md:text-6xl font-black text-black tracking-tight text-center font-sans mb-8"
+          id="flashbang-final-message"
+          className="text-4xl sm:text-6xl md:text-7xl font-black text-black tracking-tight text-center font-sans mb-8 animate-in fade-in zoom-in-90 duration-500"
         >
-          okay I give up
+          中国人不会再飞了
         </h1>
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 z-10">
           <a
             id="give-up-video-link"
             href={TARGET_VIDEO_URL}
-            className="px-8 py-3 rounded-full bg-black text-white font-bold text-base tracking-wider hover:bg-neutral-800 transition-all shadow-md active:scale-95"
+            className="px-8 py-3 rounded-full bg-black text-white font-bold text-base tracking-wider hover:bg-neutral-800 transition-all shadow-md active:scale-95 cursor-pointer"
           >
             去看视频 🎬
           </a>
@@ -185,9 +168,19 @@ export default function App() {
     <main
       id="main-app"
       className={`min-h-screen w-full bg-white flex flex-col items-center justify-center p-4 relative overflow-hidden select-none ${
-        isExploding ? 'animate-screen-shake' : ''
+        isFlashbanging ? 'animate-screen-shake' : ''
       }`}
     >
+      {/* Flashbang Active Blinding Whiteout Overlay */}
+      {isFlashbanging && (
+        <div
+          className="fixed inset-0 z-50 pointer-events-none bg-white animate-flashbang-blinding flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <div className="w-96 h-96 rounded-full bg-white animate-flashbang-burst filter blur-md" />
+        </div>
+      )}
+
       {/* Random Memes Added on Each "不" Click */}
       {randomMemes.map((m) => (
         <div
@@ -209,39 +202,10 @@ export default function App() {
         </div>
       ))}
 
-      {/* Explosion Shockwave and Particles Overlay */}
-      {isExploding && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
-          {/* Central Blast Fireball */}
-          <div className="w-48 h-48 rounded-full bg-radial from-yellow-300 via-orange-500 to-red-600 animate-explosion-flash filter blur-xs" />
-          
-          {/* White flash shockwave */}
-          <div className="absolute inset-0 bg-white/70 animate-pulse pointer-events-none" />
-
-          {/* Burst Particles */}
-          {particles.map((p) => (
-            <div
-              key={p.id}
-              className="absolute rounded-full animate-particle"
-              style={
-                {
-                  '--tx': p.tx,
-                  '--ty': p.ty,
-                  width: `${p.size}px`,
-                  height: `${p.size}px`,
-                  backgroundColor: p.color,
-                  animationDelay: `${p.delay}s`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
-      )}
-
       {/* Center Stage Container */}
       <div
         className={`flex flex-col items-center justify-center transition-all duration-300 relative z-20 ${
-          isExploding ? 'scale-125 opacity-20 filter blur-xs' : ''
+          isFlashbanging ? 'scale-105 filter blur-xs opacity-60' : ''
         }`}
       >
         {/* 1. Meme Image Button */}
@@ -320,7 +284,7 @@ export default function App() {
         )}
 
         {/* Clicks countdown hint when "不" has been clicked */}
-        {hasClickedMeme && noClicks > 0 && !isExploding && (
+        {hasClickedMeme && noClicks > 0 && !isFlashbanging && (
           <div className="mt-8 text-xs text-stone-400 font-mono tracking-wider">
             {10 - noClicks} clicks left...
           </div>
